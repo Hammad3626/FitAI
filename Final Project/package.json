@@ -1,0 +1,17 @@
+{
+  "name": "fitai-conversion",
+  "version": "1.0.0",
+  "description": "FitAI - AI-Powered Fitness Guidance Platform",
+  "private": true,
+  "scripts": {
+    "install-all": "npm install && cd frontend && npm install && cd ../backend && npm install",
+    "dev": "concurrently \"cd frontend && npm run dev\" \"cd backend && npm run dev\"",
+    "build": "cd frontend && npm run build && cd ../backend && npm run build",
+    "start": "cd backend && npm start",
+    "frontend": "cd frontend && npm run dev",
+    "backend": "cd backend && npm run dev"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.0"
+  }
+}
