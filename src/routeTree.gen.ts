@@ -15,6 +15,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ChatbotRouteImport } from './routes/chatbot'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as NutritionRouteImport } from './routes/nutrition'
+import { Route as TodosRouteImport } from './routes/todos'
 import { Route as WorkoutsRouteImport } from './routes/workouts'
 
 const IndexRoute = IndexRouteImport.update({
@@ -47,6 +48,11 @@ const NutritionRoute = NutritionRouteImport.update({
   path: '/nutrition',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TodosRoute = TodosRouteImport.update({
+  id: '/todos',
+  path: '/todos',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const WorkoutsRoute = WorkoutsRouteImport.update({
   id: '/workouts',
   path: '/workouts',
@@ -60,6 +66,7 @@ export interface FileRoutesByFullPath {
   '/chatbot': typeof ChatbotRoute
   '/dashboard': typeof DashboardRoute
   '/nutrition': typeof NutritionRoute
+  '/todos': typeof TodosRoute
   '/workouts': typeof WorkoutsRoute
 }
 export interface FileRoutesByTo {
@@ -69,6 +76,7 @@ export interface FileRoutesByTo {
   '/chatbot': typeof ChatbotRoute
   '/dashboard': typeof DashboardRoute
   '/nutrition': typeof NutritionRoute
+  '/todos': typeof TodosRoute
   '/workouts': typeof WorkoutsRoute
 }
 export interface FileRoutesById {
@@ -79,6 +87,7 @@ export interface FileRoutesById {
   '/chatbot': typeof ChatbotRoute
   '/dashboard': typeof DashboardRoute
   '/nutrition': typeof NutritionRoute
+  '/todos': typeof TodosRoute
   '/workouts': typeof WorkoutsRoute
 }
 export interface FileRouteTypes {
@@ -90,6 +99,7 @@ export interface FileRouteTypes {
     | '/chatbot'
     | '/dashboard'
     | '/nutrition'
+    | '/todos'
     | '/workouts'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -99,6 +109,7 @@ export interface FileRouteTypes {
     | '/chatbot'
     | '/dashboard'
     | '/nutrition'
+    | '/todos'
     | '/workouts'
   id:
     | '__root__'
@@ -108,6 +119,7 @@ export interface FileRouteTypes {
     | '/chatbot'
     | '/dashboard'
     | '/nutrition'
+    | '/todos'
     | '/workouts'
   fileRoutesById: FileRoutesById
 }
@@ -118,6 +130,7 @@ export interface RootRouteChildren {
   ChatbotRoute: typeof ChatbotRoute
   DashboardRoute: typeof DashboardRoute
   NutritionRoute: typeof NutritionRoute
+  TodosRoute: typeof TodosRoute
   WorkoutsRoute: typeof WorkoutsRoute
 }
 
@@ -165,6 +178,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof NutritionRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/todos': {
+      id: '/todos'
+      path: '/todos'
+      fullPath: '/todos'
+      preLoaderRoute: typeof TodosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/workouts': {
       id: '/workouts'
       path: '/workouts'
@@ -182,6 +202,7 @@ const rootRouteChildren: RootRouteChildren = {
   ChatbotRoute: ChatbotRoute,
   DashboardRoute: DashboardRoute,
   NutritionRoute: NutritionRoute,
+  TodosRoute: TodosRoute,
   WorkoutsRoute: WorkoutsRoute,
 }
 export const routeTree = rootRouteImport
