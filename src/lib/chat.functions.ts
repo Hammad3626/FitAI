@@ -89,40 +89,74 @@ function buildSystemPrompt(ctx: z.infer<typeof fitnessContextSchema>) {
   return BASE_PROMPT + "\n" + lines.join("\n");
 }
 
+function getAiConfig() {
+  const openaiApiKey = process.env.OPENAI_API_KEY || process.env.AI_COACH_API_KEY;
+  if (openaiApiKey) {
+    return {
+      apiKey: openaiApiKey,
+      endpoint: process.env.OPENAI_BASE_URL || "https://api.openai.com/v1/chat/completions",
+      model: process.env.OPENAI_MODEL || "gpt-4o-mini",
+    };
+  }
+  const lovableApiKey = process.env.LOVABLE_API_KEY;
+  if (lovableApiKey) {
+    return {
+      apiKey: lovableApiKey,
+      endpoint: "https://ai.gateway.lovable.dev/v1/chat/completions",
+      model: "google/gemini-3-flash-preview",
+    };
+  }
+  return null;
+}
+
 export const chatWithCoach = createServerFn({ method: "POST" })
-  .inputValidator((data: unknown) => messageSchema.parse(data))
+  .validator((data: unknown) => messageSchema.parse(data))
   .handler(async ({ data }) => {
-    const apiKey = process.env.LOVABLE_API_KEY;
-    if (!apiKey) {
+    const aiConfig = getAiConfig();
+    if (!aiConfig) {
       return {
         reply:
-          "The AI coach isn't configured yet. (Missing LOVABLE_API_KEY.) In the meantime, here's a quick tip: aim for 3 strength sessions and 8,000+ steps per day this week.",
+          "The AI coach isn't configured yet. (Missing OPENAI_API_KEY.) In the meantime, here's a quick tip: aim for 3 strength sessions and 8,000+ steps per day this week.",
       };
     }
 
     const systemPrompt = buildSystemPrompt(data.fitnessContext);
 
     try {
-      const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      const res = await fetch(aiConfig.endpoint, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${apiKey}`,
+          Authorization: `Bearer ${aiConfig.apiKey}`,
         },
         body: JSON.stringify({
-          model: "google/gemini-3-flash-preview",
+          model: aiConfig.model,
           messages: [{ role: "system", content: systemPrompt }, ...data.messages],
         }),
       });
 
       if (!res.ok) {
-        const text = await res.text();
-        console.error("AI gateway error", res.status, text);
+        const errorData = (await res.json().catch(() => null)) as {
+          error?: { message?: string; code?: string; type?: string };
+        } | null;
+        console.error("AI gateway error", res.status, errorData);
         if (res.status === 429) {
+          if (
+            errorData?.error?.code === "credit_balance_exhausted" ||
+            errorData?.error?.type === "insufficient_quota"
+          ) {
+            return {
+              reply:
+                "OpenAI quota exhausted: Please check your billing or add credits at platform.openai.com.",
+            };
+          }
           return { reply: "Rate limit reached — please try again in a moment." };
         }
         if (res.status === 402) {
-          return { reply: "AI credits exhausted. Add credits in Lovable workspace settings." };
+          return { reply: "AI credits exhausted. Add credits in your AI provider settings." };
+        }
+        if (errorData?.error?.message) {
+          return { reply: `AI Coach: ${errorData.error.message}` };
         }
         return { reply: "Sorry, the AI coach is unavailable right now. Try again shortly." };
       }
@@ -154,11 +188,11 @@ const routineSpecSchema = z.object({
 });
 
 export const generateCustomRoutine = createServerFn({ method: "POST" })
-  .inputValidator((data: unknown) => routineSpecSchema.parse(data))
+  .validator((data: unknown) => routineSpecSchema.parse(data))
   .handler(async ({ data }) => {
-    const apiKey = process.env.LOVABLE_API_KEY;
-    if (!apiKey) {
-      return { title: "Sample Routine", content: "AI not configured. Add LOVABLE_API_KEY." };
+    const aiConfig = getAiConfig();
+    if (!aiConfig) {
+      return { title: "Sample Routine", content: "AI not configured. Add OPENAI_API_KEY." };
     }
     const lines: string[] = [];
     if (data.goal) lines.push(`- Goal: ${data.goal}`);
@@ -198,11 +232,11 @@ The first line MUST be the \`### Title\` heading. Keep it tight and scannable.`;
     const userMsg = `Build a custom routine using these specs:\n${lines.join("\n") || "- (no specs given, build a balanced full-body session)"}`;
 
     try {
-      const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      const res = await fetch(aiConfig.endpoint, {
         method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${aiConfig.apiKey}` },
         body: JSON.stringify({
-          model: "google/gemini-3-flash-preview",
+          model: aiConfig.model,
           messages: [
             { role: "system", content: sys },
             { role: "user", content: userMsg },
@@ -210,8 +244,26 @@ The first line MUST be the \`### Title\` heading. Keep it tight and scannable.`;
         }),
       });
       if (!res.ok) {
-        if (res.status === 429) return { title: "", content: "Rate limit reached — try again shortly." };
+        const errorData = (await res.json().catch(() => null)) as {
+          error?: { message?: string; code?: string; type?: string };
+        } | null;
+        if (res.status === 429) {
+          if (
+            errorData?.error?.code === "credit_balance_exhausted" ||
+            errorData?.error?.type === "insufficient_quota"
+          ) {
+            return {
+              title: "Quota Exhausted",
+              content:
+                "OpenAI quota exhausted: Please check your billing or add credits at platform.openai.com.",
+            };
+          }
+          return { title: "", content: "Rate limit reached — try again shortly." };
+        }
         if (res.status === 402) return { title: "", content: "AI credits exhausted." };
+        if (errorData?.error?.message) {
+          return { title: "Error", content: errorData.error.message };
+        }
         return { title: "", content: "AI coach unavailable right now." };
       }
       const json = (await res.json()) as { choices?: { message?: { content?: string } }[] };
