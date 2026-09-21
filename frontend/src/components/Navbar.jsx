@@ -157,7 +157,7 @@ export function Navbar() {
                 <Link
                   to="/trainer/signin"
                   onClick={() => setOpen(false)}
-                  className="block px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-secondary/60 flex items-center gap-1.5"
+                  className="flex px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-secondary/60 items-center gap-1.5"
                 >
                   <Award className="h-4 w-4 text-primary" /> Trainer / Coach Portal
                 </Link>
