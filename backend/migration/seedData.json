@@ -1,0 +1,53 @@
+{
+  "users": [
+    {
+      "email": "alex@fitai.com",
+      "password": "password123",
+      "displayName": "Alex Rivera",
+      "avatarUrl": ""
+    },
+    {
+      "email": "demo@fitai.com",
+      "password": "password123",
+      "displayName": "Demo Athlete",
+      "avatarUrl": ""
+    }
+  ],
+  "fitnessData": [
+    {
+      "userEmail": "alex@fitai.com",
+      "goal": "Build lean muscle & increase strength",
+      "weeklyTarget": 4,
+      "workoutsThisWeek": 2,
+      "waterCups": 6,
+      "savedWorkouts": ["muscle-gain", "strength"]
+    },
+    {
+      "userEmail": "demo@fitai.com",
+      "goal": "Fat loss and cardio endurance",
+      "weeklyTarget": 5,
+      "workoutsThisWeek": 3,
+      "waterCups": 5,
+      "savedWorkouts": ["weight-loss", "cardio"]
+    }
+  ],
+  "customRoutines": [
+    {
+      "userEmail": "alex@fitai.com",
+      "title": "Day 1 — Upper Body Strength Builder",
+      "goal": "Muscle Gain",
+      "level": "Intermediate",
+      "equipment": "Dumbbells & Bench",
+      "daysPerWeek": 4,
+      "timeMin": 45,
+      "focus": "Chest, Shoulders & Triceps",
+      "injuries": "None",
+      "intensity": "Hard",
+      "dayNumber": 1,
+      "completed": true,
+      "completedAt": "2026-09-18T10:30:00.000Z",
+      "completedExercises": ["Flat Dumbbell Press", "Overhead Shoulder Press"],
+      "content": "### Day 1 — Upper Body Strength Builder\n**Goal:** Muscle Gain · **Level:** Intermediate · **Duration:** 45 min · **Equipment:** Dumbbells & Bench\n\n**Warm-up (5 min)**\n- Arm swings & shoulder circles — 60s\n- Band pull-aparts — 15 reps\n- Push-ups — 10 reps\n\n**Main sets**\n| Exercise | Sets | Reps | Rest |\n|---|---|---|---|\n| Flat Dumbbell Press | 4 | 8–10 reps | 90s |\n| Overhead Shoulder Press | 3 | 10 reps | 75s |\n| Incline Dumbbell Flyes | 3 | 12 reps | 60s |\n| Tricep Dips on Bench | 3 | 12–15 reps | 60s |\n| Plank Shoulder Taps | 3 | 30s | 45s |\n\n**Cool-down (3 min)**\n- Chest doorway stretch — 45s\n- Overhead triceps stretch — 30s each side\n\n**Coach notes:**\nMaintain controlled tension on negative movement. Rest 90 seconds between heavy presses."
+    }
+  ]
+}
